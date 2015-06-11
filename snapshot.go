@@ -63,12 +63,12 @@ func (service *SnapshotService) CreateFromRepo(snapshot *Snapshot, repo *LocalRe
 	}
 
 	var newSnapshot Snapshot
-	err = json.NewDecoder(resp.Body).Decode(&newSnapshot)
+	err = json.Unmarshal(body, &newSnapshot)
 
 	if err != nil {
 		return nil, err
 	}
-	return &newSnapshot, err
+	return &newSnapshot, nil
 }
 
 func (service *SnapshotService) Delete(snapshot *Snapshot) error {

@@ -7,15 +7,6 @@ import (
 	"github.com/kr/pretty"
 )
 
-func TestListSnapshots(t *testing.T) {
-	client := testClient()
-	snapshots, err := client.Snapshot.List()
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Printf("%# v\n", pretty.Formatter(snapshots))
-}
-
 func TestCreateSnapshot(t *testing.T) {
 	client := testClient()
 	repo := &LocalRepo{
@@ -34,25 +25,44 @@ func TestCreateSnapshot(t *testing.T) {
 		t.Error(err)
 	}
 
-	_, err = client.LocalRepo.AddFile("libboost-program-options-dev_1.49.0.1_i386.deb")
+	fr, err := client.LocalRepo.AddFile("libboost-program-options-dev_1.49.0.1", repo)
 	if err != nil {
 		t.Error(err)
 	}
-	_, err = client.Snapshot.CreateFromRepo(snapshot, repo)
+	fmt.Printf("%# v\n", pretty.Formatter(fr))
+
+	ns, err := client.Snapshot.CreateFromRepo(snapshot, repo)
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Printf("%# v\n", pretty.Formatter(ns))
 
 }
 
-/*
-func TestDeleteRepo(t *testing.T) {
+func TestListSnapshots(t *testing.T) {
+	client := testClient()
+	snapshots, err := client.Snapshot.List()
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("%# v\n", pretty.Formatter(snapshots))
+}
+
+func TestDeleteSnapshot(t *testing.T) {
 	client := testClient()
 	repo := &LocalRepo{
-		Name: "test_repo"}
-	err := client.DeleteRepo(repo)
+		Name: "test_repo",
+	}
+	snapshot := &Snapshot{
+		Name: "test_snap",
+	}
+	err := client.Snapshot.Delete(snapshot)
 	if err != nil {
 		t.Error(err)
 	}
+	err = client.LocalRepo.Delete(repo)
+	if err != nil {
+		t.Error(err)
+	}
+
 }
-*/

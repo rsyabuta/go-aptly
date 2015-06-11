@@ -44,6 +44,7 @@ func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
 	}
 
 	resp, err := service.Client.Post("repos", "application/json", nil, bytes.NewBuffer(reqBody))
+	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +55,6 @@ func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
 
 	var newRepo LocalRepo
 	err = json.NewDecoder(resp.Body).Decode(&newRepo)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
@@ -66,25 +66,43 @@ func (service *LocalRepoService) Delete(repo *LocalRepo) error {
 		return errors.New("aptly: passed repo missing Name field")
 	}
 	resp, err := service.Client.Delete(fmt.Sprintf("repos/%s", repo.Name), nil)
+	defer resp.Body.Close()
+	if err != nil {
+		return err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
 	if resp.StatusCode == 404 {
-		return errors.New(fmt.Sprintf("aptly: repo %s doesn't exist", repo.Name))
+		return errors.New(fmt.Sprintf("aptly: %s", body))
 	} else if resp.StatusCode == 409 {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		defer resp.Body.Close()
-		return errors.New(fmt.Sprintf("%q", body))
+		return errors.New(fmt.Sprintf("aptly: %s", body))
 	}
 	return nil
 }
 
-func (service *LocalRepoService) AddFile(file string) (*FileReport, error) {
-	return nil, nil
+func (service *LocalRepoService) AddFile(file string, repo *LocalRepo) (*FileResponse, error) {
+	if repo.Name == "" {
+		return nil, errors.New("aptly: passed repo missing Name field")
+	}
+
+	resp, err := service.Client.Post(fmt.Sprintf("repos/%s/file/%s", repo.Name, file), "application/json", nil, nil)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == 404 {
+		return nil, errors.New(fmt.Sprintf("aptly: repo %s doesn't exist", repo.Name))
+	}
+	var result FileResponse
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, err
 }
 
 func (service *LocalRepoService) List() (*LocalRepoCollection, error) {

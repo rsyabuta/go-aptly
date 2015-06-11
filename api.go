@@ -10,9 +10,10 @@ import (
 type Client struct {
 	Url string
 
-	File      *FileService
-	LocalRepo *LocalRepoService
-	Snapshot  *SnapshotService
+	File          *FileService
+	LocalRepo     *LocalRepoService
+	Snapshot      *SnapshotService
+	PublishedRepo *PublishedRepoService
 }
 
 func NewClient(url string) (*Client, error) {
@@ -23,6 +24,7 @@ func NewClient(url string) (*Client, error) {
 	c.File = &FileService{Client: c}
 	c.LocalRepo = &LocalRepoService{Client: c}
 	c.Snapshot = &SnapshotService{Client: c}
+	c.PublishedRepo = &PublishedRepoService{Client: c}
 	return c, nil
 }
 
