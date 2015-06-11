@@ -7,58 +7,73 @@ import (
 	"net/url"
 )
 
-type Aptly struct {
+type Client struct {
 	Url string
+
+	File      *FileService
+	LocalRepo *LocalRepoService
+	Snapshot  *SnapshotService
 }
 
-func (aptly *Aptly) Get(endpoint string) (*http.Response, error) {
-	request, _ := http.NewRequest("GET", aptly.requestUrl(endpoint), nil)
-	return aptly.makeRequest(request)
+func NewClient(url string) (*Client, error) {
+	c := &Client{
+		Url: url,
+	}
+
+	c.File = &FileService{Client: c}
+	c.LocalRepo = &LocalRepoService{Client: c}
+	c.Snapshot = &SnapshotService{Client: c}
+	return c, nil
 }
 
-func (aptly *Aptly) Post(endpoint string, contentType string, params map[string]string, body io.Reader) (*http.Response, error) {
-	query, err := aptly.buildQueryString(endpoint, params)
+func (client *Client) Get(endpoint string) (*http.Response, error) {
+	request, _ := http.NewRequest("GET", client.requestUrl(endpoint), nil)
+	return client.makeRequest(request)
+}
+
+func (client *Client) Post(endpoint string, contentType string, params map[string]string, body io.Reader) (*http.Response, error) {
+	query, err := client.buildQueryString(endpoint, params)
 	if err != nil {
 		return nil, err
 	}
 
 	request, err := http.NewRequest("POST", query, body)
 	request.Header.Set("Content-Type", contentType)
-	return aptly.makeRequest(request)
+	return client.makeRequest(request)
 }
 
-func (aptly *Aptly) Delete(endpoint string, params map[string]string) (*http.Response, error) {
-	query, err := aptly.buildQueryString(endpoint, params)
+func (client *Client) Delete(endpoint string, params map[string]string) (*http.Response, error) {
+	query, err := client.buildQueryString(endpoint, params)
 	if err != nil {
 		return nil, err
 	}
 
 	request, _ := http.NewRequest("DELETE", query, nil)
-	return aptly.makeRequest(request)
+	return client.makeRequest(request)
 }
 
-func (aptly *Aptly) Put(endpoint string, params map[string]string, body io.Reader) (*http.Response, error) {
-	query, err := aptly.buildQueryString(endpoint, params)
+func (client *Client) Put(endpoint string, params map[string]string, body io.Reader) (*http.Response, error) {
+	query, err := client.buildQueryString(endpoint, params)
 	if err != nil {
 		return nil, err
 	}
 
 	request, err := http.NewRequest("PUT", query, body)
 	request.Header.Set("Content-Type", "application/json")
-	return aptly.makeRequest(request)
+	return client.makeRequest(request)
 }
 
-func (aptly *Aptly) makeRequest(request *http.Request) (*http.Response, error) {
-	client := &http.Client{}
-	return client.Do(request)
+func (client *Client) makeRequest(request *http.Request) (*http.Response, error) {
+	c := &http.Client{}
+	return c.Do(request)
 }
 
-func (aptly *Aptly) requestUrl(endpoint string) string {
-	return fmt.Sprintf("%s/api/%s", aptly.Url, endpoint)
+func (client *Client) requestUrl(endpoint string) string {
+	return fmt.Sprintf("%s/api/%s", client.Url, endpoint)
 }
 
-func (aptly *Aptly) buildQueryString(endpoint string, params map[string]string) (string, error) {
-	u, err := url.Parse(aptly.requestUrl(endpoint))
+func (client *Client) buildQueryString(endpoint string, params map[string]string) (string, error) {
+	u, err := url.Parse(client.requestUrl(endpoint))
 	if err != nil {
 		return "", err
 	}

@@ -1,15 +1,20 @@
 package aptly
 
 import (
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+func testClient() *Client {
+	c, _ := NewClient("http://localhost:8080")
+	return c
+}
+
 func TestGet(t *testing.T) {
-	aptly := new(Aptly)
-	aptly.Url = "http://localhost:8080"
-	resp, err := aptly.Get("repos")
+	client := testClient()
+	resp, err := client.Get("repos")
 	if err != nil {
 		t.Error(err)
 	}
