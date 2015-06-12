@@ -34,6 +34,20 @@ type FileReport struct {
 	Deleted  []string `json:"Deleted"`
 }
 
+func (service *LocalRepoService) Get(name string) (*LocalRepo, err) {
+	resp, err := service.Client.Get(fmt.Sprintf("repos/%s", name))
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	var repo LocalRepo
+	err = json.NewDecoder(resp.Body).Decode(&repo)
+	if err != nil {
+		return nil, err
+	}
+	return &repo, err
+}
+
 func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
 	if repo.Name == "" {
 		return nil, errors.New("aptly: passed repo missing Name field")
