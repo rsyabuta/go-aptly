@@ -16,11 +16,11 @@ type FileService struct {
 }
 
 type DebFileCollection struct {
-	files []string
+	Files []string
 }
 
 type DebDirCollection struct {
-	dirs []string
+	Dirs []string
 }
 
 func (service *FileService) UploadFile(file string) (*DebFileCollection, error) {
