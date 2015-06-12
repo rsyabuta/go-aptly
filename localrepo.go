@@ -34,7 +34,7 @@ type FileReport struct {
 	Deleted  []string `json:"Deleted"`
 }
 
-func (service *LocalRepoService) Get(name string) (*LocalRepo, err) {
+func (service *LocalRepoService) Get(name string) (*LocalRepo, error) {
 	resp, err := service.Client.Get(fmt.Sprintf("repos/%s", name))
 	defer resp.Body.Close()
 	if err != nil {
