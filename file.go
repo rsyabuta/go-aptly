@@ -50,7 +50,7 @@ func (service *FileService) UploadFile(file string) (*DebFileCollection, error) 
 		return nil, err
 	}
 	var collection DebFileCollection
-	err = json.NewDecoder(resp.Body).Decode(&collection.files)
+	err = json.NewDecoder(resp.Body).Decode(&collection.Files)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (service *FileService) ListDirectories() (*DebDirCollection, error) {
 		return nil, err
 	}
 	var collection DebDirCollection
-	err = json.NewDecoder(resp.Body).Decode(&collection.dirs)
+	err = json.NewDecoder(resp.Body).Decode(&collection.Dirs)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (service *FileService) ListFiles(dir string) (*DebFileCollection, error) {
 	}
 
 	var collection DebFileCollection
-	err = json.NewDecoder(resp.Body).Decode(&collection.files)
+	err = json.NewDecoder(resp.Body).Decode(&collection.Files)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
