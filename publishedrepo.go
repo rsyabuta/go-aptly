@@ -63,7 +63,12 @@ func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*Pub
 		return nil, err
 	}
 
-	resp, err := service.Client.Post("publish", "application/json", nil, bytes.NewBuffer(reqBody))
+	prefix := ""
+	if publishedrepo.Prefix != "" {
+		prefix = fmt.Sprintf("/%s", publishedrepo.Prefix)
+	}
+
+	resp, err := service.Client.Post(fmt.Sprintf("publish%s", prefix), "application/json", nil, bytes.NewBuffer(reqBody))
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
@@ -88,50 +93,6 @@ func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*Pub
 		return nil, err
 	}
 	return &pr, nil
-}
-
-func (service *PublishedRepoService) PublishFromLocalRepo(localrepo *LocalRepo, pubrepo *PublishedRepo) (*PublishedRepo, error) {
-	if localrepo.Name == "" {
-		return nil, errors.New("aptly: passed repo missing Name field")
-	}
-	source := service.BuildSourceFromLocalRepo(localrepo, "main")
-	pubrepo.Sources = source
-	pubrepo.SourceKind = "local"
-	pr, err := service.Publish(pubrepo)
-	if err != nil {
-		return nil, err
-	}
-	return pr, nil
-}
-
-func (service *PublishedRepoService) PublishFromSnapshot(snapshot *Snapshot, pubrepo *PublishedRepo) (*PublishedRepo, error) {
-	if snapshot.Name == "" {
-		return nil, errors.New("aptly: passed repo missing Name field")
-	}
-	source := service.BuildSourceFromSnapshot(snapshot, "main")
-	pubrepo.Sources = source
-	pubrepo.SourceKind = "snapshot"
-	pr, err := service.Publish(pubrepo)
-	if err != nil {
-		return nil, err
-	}
-	return pr, nil
-}
-
-func (service *PublishedRepoService) BuildSourceFromSnapshot(snapshot *Snapshot, component string) []Source {
-	s := Source{
-		Name:      snapshot.Name,
-		Component: component}
-	sl := []Source{s}
-	return sl
-}
-
-func (service *PublishedRepoService) BuildSourceFromLocalRepo(localrepo *LocalRepo, component string) []Source {
-	s := Source{
-		Name:      localrepo.Name,
-		Component: component}
-	sl := []Source{s}
-	return sl
 }
 
 func (service *PublishedRepoService) Drop(publishedrepo *PublishedRepo) error {
