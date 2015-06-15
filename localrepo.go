@@ -77,6 +77,7 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
 	}
 	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/packages", repo.Name), params)
 	defer resp.Body.Close()
+	fmt.Printf("%# v", resp)
 	if err != nil {
 		return nil, err
 	}
