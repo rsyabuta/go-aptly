@@ -97,7 +97,7 @@ func (service *PublishedRepoService) PublishFromLocalRepo(localrepo *LocalRepo, 
 	source := service.BuildSourceFromLocalRepo(localrepo, "main")
 	pubrepo.Sources = source
 	pubrepo.SourceKind = "local"
-	pr, err := service.Publish(publishedrepo)
+	pr, err := service.Publish(pubrepo)
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (service *PublishedRepoService) PublishFromSnapshot(snapshot *Snapshot, pub
 	source := service.BuildSourceFromSnapshot(snapshot, "main")
 	pubrepo.Sources = source
 	pubrepo.SourceKind = "snapshot"
-	pr, err := service.Publish(publishedrepo)
+	pr, err := service.Publish(pubrepo)
 	if err != nil {
 		return nil, err
 	}
