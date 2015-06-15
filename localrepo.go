@@ -89,7 +89,7 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) (*PackageCollection, 
 	if err != nil {
 		return nil, err
 	}
-	return pc, err
+	return &pc, err
 }
 
 func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
