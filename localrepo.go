@@ -77,10 +77,11 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
 	}
 	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/packages", repo.Name), params)
 	defer resp.Body.Close()
-	fmt.Printf("%# v", resp)
 	if err != nil {
 		return nil, err
 	}
+	bs, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println(string(bs))
 	var pc []Package
 	err = json.NewDecoder(resp.Body).Decode(pc)
 	if err != nil {
