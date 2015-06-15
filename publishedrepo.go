@@ -24,6 +24,12 @@ type PublishedRepo struct {
 	Signing       Signing  `json:"Signing"`
 }
 
+type UpdateRepo struct {
+	Snapshots      []Source `json:"Snapshots"`
+	ForceOverwrite bool     `json:"ForceOverwrite"`
+	Signing        Signing  `json:"Signing"`
+}
+
 type Source struct {
 	Name      string `json:"Name"`
 	Component string `json:"Component"`
@@ -55,6 +61,42 @@ func (service *PublishedRepoService) List() (*PublishedRepoCollection, error) {
 		return nil, err
 	}
 	return &collection, err
+}
+
+func (service *PublishedRepoService) Update(publishedrepo *PublishedRepo) (*PublishedRepo, error) {
+	ur := &UpdateRepo{
+		Snapshots: publishedrepo.Sources,
+		Signing:   publishedrepo.Signing,
+	}
+	reqBody, err := json.Marshal(ur)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := service.Client.Put(fmt.Sprintf("publish/%s/%s", publishedrepo.Prefix, publishedrepo.Distribution), "application/json", nil, bytes.NewBuffer(reqBody))
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == 400 {
+		return nil, errors.New(fmt.Sprintf("aptly: %s", body))
+	} else if resp.StatusCode == 404 {
+		return nil, errors.New(fmt.Sprintf("aptly: %s", body))
+	} else if resp.StatusCode == 500 {
+		return nil, errors.New(fmt.Sprintf("aptly: %s", body))
+	}
+
+	var pr PublishedRepo
+	err = json.Unmarshal(body, &pr)
+
+	if err != nil {
+		return nil, err
+	}
+	return &pr, nil
 }
 
 func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*PublishedRepo, error) {
