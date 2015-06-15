@@ -90,19 +90,13 @@ func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*Pub
 	return &pr, nil
 }
 
-func (service *PublishedRepoService) PublishFromLocalRepo(localrepo *LocalRepo) (*PublishedRepo, error) {
+func (service *PublishedRepoService) PublishFromLocalRepo(localrepo *LocalRepo, pubrepo *PublishedRepo) (*PublishedRepo, error) {
 	if localrepo.Name == "" {
 		return nil, errors.New("aptly: passed repo missing Name field")
 	}
 	source := service.BuildSourceFromLocalRepo(localrepo, "main")
-	publishedrepo := &PublishedRepo{
-		SourceKind:   "local",
-		Distribution: "trusty",
-		Sources:      source,
-		Signing: Signing{
-			Skip: true,
-		},
-	}
+	pubrepo.Sources = source
+	pubrepo.SourceKind = "local"
 	pr, err := service.Publish(publishedrepo)
 	if err != nil {
 		return nil, err
@@ -110,19 +104,13 @@ func (service *PublishedRepoService) PublishFromLocalRepo(localrepo *LocalRepo) 
 	return pr, nil
 }
 
-func (service *PublishedRepoService) PublishFromSnapshot(snapshot *Snapshot) (*PublishedRepo, error) {
+func (service *PublishedRepoService) PublishFromSnapshot(snapshot *Snapshot, pubrepo *PublishedRepo) (*PublishedRepo, error) {
 	if snapshot.Name == "" {
 		return nil, errors.New("aptly: passed repo missing Name field")
 	}
 	source := service.BuildSourceFromSnapshot(snapshot, "main")
-	publishedrepo := &PublishedRepo{
-		SourceKind:   "snapshot",
-		Distribution: "trusty",
-		Sources:      source,
-		Signing: Signing{
-			Skip: true,
-		},
-	}
+	pubrepo.Sources = source
+	pubrepo.SourceKind = "snapshot"
 	pr, err := service.Publish(publishedrepo)
 	if err != nil {
 		return nil, err
