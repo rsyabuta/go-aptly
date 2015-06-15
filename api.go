@@ -33,14 +33,17 @@ func (client *Client) Get(endpoint string) (*http.Response, error) {
 	return client.makeRequest(request)
 }
 
-func (client *Client) GetWithParams(endpoint string, params map[string]string) {
+func (client *Client) GetWithParams(endpoint string, params map[string]string) (*http.Response, error) {
 	query, err := client.buildQueryString(endpoint, params)
 	if err != nil {
 		return nil, err
 	}
 
 	request, err := http.NewRequest("GET", query, nil)
-	return client.makeRequest(request)
+	if err != nil {
+		return nil, err
+	}
+	return client.makeRequest(request), nil
 }
 
 func (client *Client) Post(endpoint string, contentType string, params map[string]string, body io.Reader) (*http.Response, error) {
