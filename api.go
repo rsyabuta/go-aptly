@@ -43,7 +43,7 @@ func (client *Client) GetWithParams(endpoint string, params map[string]string) (
 	if err != nil {
 		return nil, err
 	}
-	return client.makeRequest(request), nil
+	return client.makeRequest(request)
 }
 
 func (client *Client) Post(endpoint string, contentType string, params map[string]string, body io.Reader) (*http.Response, error) {
