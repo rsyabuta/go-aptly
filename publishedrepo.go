@@ -72,7 +72,8 @@ func (service *PublishedRepoService) Update(publishedrepo *PublishedRepo) (*Publ
 	if err != nil {
 		return nil, err
 	}
-	resp, err := service.Client.Put(fmt.Sprintf("publish/%s/%s", publishedrepo.Prefix, publishedrepo.Distribution), "application/json", nil, bytes.NewBuffer(reqBody))
+
+	resp, err := service.Client.Put(fmt.Sprintf("publish/%s/%s", publishedrepo.Prefix, publishedrepo.Distribution), nil, bytes.NewBuffer(reqBody))
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
@@ -110,7 +111,7 @@ func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*Pub
 		prefix = fmt.Sprintf("/%s", publishedrepo.Prefix)
 	}
 
-	resp, err := service.Client.Post(fmt.Sprintf("publish%s", prefix), nil, bytes.NewBuffer(reqBody))
+	resp, err := service.Client.Post(fmt.Sprintf("publish%s", prefix), "application/json", nil, bytes.NewBuffer(reqBody))
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
