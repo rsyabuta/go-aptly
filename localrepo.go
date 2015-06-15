@@ -57,6 +57,10 @@ type Package struct {
 	Version       string `json:"Version"`
 }
 
+type PackageCollection struct {
+	Packages []Package
+}
+
 func (service *LocalRepoService) Get(name string) (*LocalRepo, error) {
 	resp, err := service.Client.Get(fmt.Sprintf("repos/%s", name))
 	defer resp.Body.Close()
@@ -80,10 +84,8 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
 	if err != nil {
 		return nil, err
 	}
-	bs, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bs))
-	var pc []Package
-	err = json.NewDecoder(resp.Body).Decode(pc)
+	var pc PackageCollection
+	err = json.NewDecoder(resp.Body).Decode(&pc.Packages)
 	if err != nil {
 		return nil, err
 	}
