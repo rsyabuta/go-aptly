@@ -75,7 +75,7 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
 	params := map[string]string{
 		"format": "details",
 	}
-	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/package", repo.Name), params)
+	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/packages", repo.Name), params)
 	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
