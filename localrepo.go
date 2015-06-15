@@ -34,6 +34,29 @@ type FileReport struct {
 	Deleted  []string `json:"Deleted"`
 }
 
+type Package struct {
+	Architecture  string `json:"Architecture"`
+	Description   string `json:"Description"`
+	Filename      string `json:"Filename"`
+	FilesHash     string `json:"FilesHash"`
+	Homepage      string `json:"Homepage"`
+	InstalledSize string `json:"Installed-Size"`
+	Key           string `json:"Key"`
+	License       string `json:"License"`
+	MD5Sum        string `json:"MD5Sum"`
+	Maintainer    string `json:"Maintainer"`
+	Package       string `json:"Package"`
+	Priority      string `json:"Priority"`
+	Recommends    string `json:"Recommends"`
+	SHA1          string `json:"SHA1"`
+	SHA256        string `json:"SHA256"`
+	Section       string `json:"Section"`
+	ShortKey      string `json:"ShortKey"`
+	Size          string `json:"Size"`
+	Vendor        string `json:"Vendor"`
+	Version       string `json:"Version"`
+}
+
 func (service *LocalRepoService) Get(name string) (*LocalRepo, error) {
 	resp, err := service.Client.Get(fmt.Sprintf("repos/%s", name))
 	defer resp.Body.Close()
@@ -46,6 +69,17 @@ func (service *LocalRepoService) Get(name string) (*LocalRepo, error) {
 		return nil, err
 	}
 	return &repo, err
+}
+
+func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
+	params := map[string]string{
+		"format": "details",
+	}
+	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/package", repo.Name), params)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
 }
 
 func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
