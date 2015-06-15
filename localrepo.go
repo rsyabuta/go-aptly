@@ -75,7 +75,7 @@ func (service *LocalRepoService) Get(name string) (*LocalRepo, error) {
 	return &repo, err
 }
 
-func (service *LocalRepoService) Packages(repo *LocalRepo) ([]Package, error) {
+func (service *LocalRepoService) Packages(repo *LocalRepo) (*PackageCollection, error) {
 	params := map[string]string{
 		"format": "details",
 	}
