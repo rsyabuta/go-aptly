@@ -75,7 +75,7 @@ func (service *SnapshotService) Delete(snapshot *Snapshot) error {
 	if snapshot.Name == "" {
 		return errors.New("aptly: passed repo missing Name field")
 	}
-	resp, err := service.Client.Delete(fmt.Sprintf("snapshots/%s", snapshot.Name), nil)
+	resp, err := service.Client.Delete(fmt.Sprintf("snapshots/%s", snapshot.Name), nil, nil)
 	defer resp.Body.Close()
 	if err != nil {
 		return err

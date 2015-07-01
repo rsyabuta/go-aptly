@@ -139,7 +139,7 @@ func (service *PublishedRepoService) Publish(publishedrepo *PublishedRepo) (*Pub
 }
 
 func (service *PublishedRepoService) Drop(publishedrepo *PublishedRepo) error {
-	resp, err := service.Client.Delete(fmt.Sprintf("publish/%s/%s", publishedrepo.Prefix, publishedrepo.Distribution), nil)
+	resp, err := service.Client.Delete(fmt.Sprintf("publish/%s/%s", publishedrepo.Prefix, publishedrepo.Distribution), nil, nil)
 	defer resp.Body.Close()
 	if err != nil {
 		return err

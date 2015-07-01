@@ -92,6 +92,24 @@ func (service *LocalRepoService) Packages(repo *LocalRepo) (*PackageCollection, 
 	return &pc, err
 }
 
+func (service *LocalRepoService) PackageSearch(query string, repo *LocalRepo) (*PackageCollection, error) {
+	params := map[string]string{
+		"q":      query,
+		"format": "details",
+	}
+	resp, err := service.Client.GetWithParams(fmt.Sprintf("repos/%s/packages", repo.Name), params)
+	defer resp.Body.Close()
+	if err != nil {
+		return nil, err
+	}
+	var pc PackageCollection
+	err = json.NewDecoder(resp.Body).Decode(&pc.Packages)
+	if err != nil {
+		return nil, err
+	}
+	return &pc, err
+}
+
 func (service *LocalRepoService) Create(repo *LocalRepo) (*LocalRepo, error) {
 	if repo.Name == "" {
 		return nil, errors.New("aptly: passed repo missing Name field")
@@ -123,7 +141,7 @@ func (service *LocalRepoService) Delete(repo *LocalRepo) error {
 	if repo.Name == "" {
 		return errors.New("aptly: passed repo missing Name field")
 	}
-	resp, err := service.Client.Delete(fmt.Sprintf("repos/%s", repo.Name), nil)
+	resp, err := service.Client.Delete(fmt.Sprintf("repos/%s", repo.Name), nil, nil)
 	defer resp.Body.Close()
 	if err != nil {
 		return err
@@ -161,6 +179,33 @@ func (service *LocalRepoService) AddFile(file string, repo *LocalRepo) (*FileRes
 		return nil, err
 	}
 	return &result, err
+}
+
+func (service *LocalRepoService) DeletePackages(keys []string, repo *LocalRepo) error {
+	if repo.Name == "" {
+		return errors.New("aptly: passed repo missing Name field")
+	}
+	p := map[string][]string{}
+	p["PackageRefs"] = keys
+	reqBody, err := json.Marshal(p)
+	if err != nil {
+		return err
+	}
+	resp, err := service.Client.Delete(fmt.Sprintf("repos/%s/packages", repo.Name), nil, bytes.NewBuffer(reqBody))
+	defer resp.Body.Close()
+	if err != nil {
+		return err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode == 404 {
+		return errors.New(fmt.Sprintf("aptly: %s", body))
+	}
+	return nil
 }
 
 func (service *LocalRepoService) List() (*LocalRepoCollection, error) {

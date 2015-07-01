@@ -57,13 +57,16 @@ func (client *Client) Post(endpoint string, contentType string, params map[strin
 	return client.makeRequest(request)
 }
 
-func (client *Client) Delete(endpoint string, params map[string]string) (*http.Response, error) {
+func (client *Client) Delete(endpoint string, params map[string]string, body io.Reader) (*http.Response, error) {
 	query, err := client.buildQueryString(endpoint, params)
 	if err != nil {
 		return nil, err
 	}
 
-	request, _ := http.NewRequest("DELETE", query, nil)
+	request, _ := http.NewRequest("DELETE", query, body)
+	if body != nil {
+		request.Header.Set("Content-Type", "application/json")
+	}
 	return client.makeRequest(request)
 }
 

@@ -1,12 +1,6 @@
 package aptly
 
-import (
-	"fmt"
-	"testing"
-
-	"github.com/kr/pretty"
-)
-
+/*
 func TestPublishFromSnapshot(t *testing.T) {
 	client := testClient()
 	repo := &LocalRepo{
@@ -61,3 +55,4 @@ func TestPublishFromSnapshot(t *testing.T) {
 	}
 
 }
+*/

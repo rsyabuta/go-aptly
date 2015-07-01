@@ -7,6 +7,20 @@ import (
 	"github.com/kr/pretty"
 )
 
+func TestDeleteAllSnapshots(t *testing.T) {
+	client := testClient()
+	snaps, err := client.Snapshot.List()
+	if err != nil {
+		t.Error(err)
+	}
+	for _, s := range snaps.Snapshots {
+		err = client.Snapshot.Delete(&s)
+		if err != nil {
+			t.Error(err)
+		}
+	}
+}
+
 func TestCreateSnapshot(t *testing.T) {
 	client := testClient()
 	repo := &LocalRepo{

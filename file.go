@@ -96,7 +96,7 @@ func (service *FileService) ListFiles(dir string) (*DebFileCollection, error) {
 }
 
 func (service *FileService) Delete(item string) error {
-	resp, err := service.Client.Delete(fmt.Sprintf("files/%s", item), nil)
+	resp, err := service.Client.Delete(fmt.Sprintf("files/%s", item), nil, nil)
 	defer resp.Body.Close()
 	return err
 }
