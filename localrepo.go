@@ -57,6 +57,23 @@ type Package struct {
 	Version       string `json:"Version"`
 }
 
+func (pl *PackageCollection) Len() int {
+	return len(pl.Packages)
+
+}
+
+func (pl *PackageCollection) Swap(a, b int) {
+	pl.Packages[a], pl.Packages[b] = pl.Packages[b], pl.Packages[a]
+}
+
+func (pl *PackageCollection) Less(a, b int) bool {
+	if pl.Packages[a].Package == pl.Packages[b].Package {
+		return pl.Packages[a].Package < pl.Packages[b].Package
+	}
+
+	return pl.Packages[a].Version < pl.Packages[b].Version
+}
+
 type PackageCollection struct {
 	Packages []Package
 }
