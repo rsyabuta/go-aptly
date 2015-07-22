@@ -185,7 +185,7 @@ func (pl *PackageCollection) Swap(a, b int) {
 
 func (pl *PackageCollection) Less(a, b int) bool {
 	if pl.Packages[a].Package == pl.Packages[b].Package {
-		return pl.Packages[a].Package < pl.Packages[b].Package
+		return pl.Packages[a].Version < pl.Packages[b].Version
 	}
-	return pl.Packages[a].Version < pl.Packages[b].Version
+	return pl.Packages[a].Package < pl.Packages[b].Package
 }
